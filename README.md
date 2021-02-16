@@ -3,4 +3,4 @@
 
 
 npm run server 
-cd client && npm run client
+ve npm run client
