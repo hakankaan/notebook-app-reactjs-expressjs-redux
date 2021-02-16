@@ -23,6 +23,7 @@ export const reducer = (state = INITIAL_STATE, action) => {
     case "getNotebooks":
       return { ...state, notebookList: action.payload };
 
+    
     default:
       return state;
   }
