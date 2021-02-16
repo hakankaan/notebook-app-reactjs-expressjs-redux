@@ -3,8 +3,11 @@ import "./App.css";
 import { connect } from "react-redux";
 import {
   getNotebooks,
+  changeSelectedNotebook,
   getSelectedNotebookContent,
   createNotebook,
+  deleteNotebook,
+  saveSelectedNotebookContent,
 } from "./redux/actions";
 
 function App(props) {
@@ -16,17 +19,15 @@ function App(props) {
   }, []);
 
   useEffect(() => {
-    console.log(props.notebookList);
-  }, [props.notebookList]);
-
-  useEffect(() => {
     props.getSelectedNotebookContent(props.selectedNotebook);
   }, [props.selectedNotebook]);
 
   useEffect(() => {
     if (isCreating === "yeni") {
       props.getNotebooks();
+      props.changeSelectedNotebook(name);
       setIsCreating(false);
+      setName("");
     }
   }, [isCreating]);
 
@@ -47,41 +48,51 @@ function App(props) {
                           ? "listItem active"
                           : "listItem"
                       }
+                      onClick={() => props.changeSelectedNotebook(name)}
                     >
                       {name}
-                      <div className="closeHolder" >X</div>
+                      <div
+                        className="closeHolder"
+                        onClick={() => props.deleteNotebook(name)}
+                      >
+                        X
+                      </div>
                     </div>
                   );
                 })}
               </div>
-              {isCreating ? (
-                <div className="newNotebook">
-                  <input
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                  />
-                  <button
-                    className="btn"
-                    onClick={() => {
-                      props.createNotebook(name, setName, setIsCreating);
-                    }}
-                  >
-                    Create
-                  </button>
-                </div>
-              ) : (
-                <div className="newNotebook">
-                  <button className="btn" onClick={() => setIsCreating(true)}>
-                    New Notebook
-                  </button>
-                </div>
-              )}
+
+              <div className="newNotebook">
+                <input
+                  id="createName"
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Name..."
+                />
+                <button
+                  className="btn"
+                  onClick={() => {
+                    props.createNotebook(name, setName, setIsCreating);
+                  }}
+                >
+                  Create
+                </button>
+              </div>
             </div>
           </div>
           <div className="content">
             {props.selectedNotebook && (
-              <textarea value={props.selectedNotebookContent} />
+              <textarea
+                id={props.selectedNotebook + "textarea"}
+                value={props.selectedNotebookContent}
+                onChange={(e) => {
+                  props.saveSelectedNotebookContent(
+                    props.selectedNotebook,
+                    e.target.value
+                  );
+                }}
+              />
             )}
           </div>
         </div>
@@ -96,6 +107,9 @@ const mapStateToProps = (state) => {
 
 export default connect(mapStateToProps, {
   getNotebooks,
+  changeSelectedNotebook,
   getSelectedNotebookContent,
   createNotebook,
+  deleteNotebook,
+  saveSelectedNotebookContent,
 })(App);
